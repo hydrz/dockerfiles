@@ -1,25 +1,26 @@
-FROM hydrz/ubuntu:20.04
+FROM ubuntu:20.04
 
-LABEL maintainer "hydrz <n.haoyuan@gmail.com>"
+RUN apt-get update
+RUN apt-get -y install ca-certificates curl && update-ca-certificates
 
-RUN set -xe; \
-    echo "**** install CoreDNS ****" && \
-    COREDNS_VERSION=$(curl -sX GET "https://api.github.com/repos/coredns/coredns/releases/latest" \
-    | awk '/tag_name/{print $4;exit}' FS='[""]' | awk '{print substr($1,2); }') && \
-    curl -o \
-    /tmp/coredns.tar.gz -L \
-    "https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_linux_arm64.tgz" && \
-    tar xf \
-    /tmp/coredns.tar.gz -C \
-    /app && \
-    echo "**** clean up ****" && \
-    rm -rf \
-    /tmp/* \
-    /var/lib/apt/lists/* \
-    /var/tmp/*
+ARG TARGETOS TARGETARCH
 
-# add local files
-COPY /root /
+RUN \
+ mkdir /app && \
+ COREDNS_VERSION=$(curl -sX GET "https://api.github.com/repos/coredns/coredns/releases/latest" \
+	| awk '/tag_name/{print $4;exit}' FS='[""]' | awk '{print substr($1,2); }') && \
+ curl -o \
+	/tmp/coredns.tar.gz -L \
+	"https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_${TARGETOS}_${TARGETARCH}.tgz" && \
+ tar xf \
+	/tmp/coredns.tar.gz -C \
+	/app
 
-# ports and volumes
-EXPOSE 53/tcp 53/udp 
+# Clean up
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    rm /var/log/lastlog /var/log/faillog
+
+EXPOSE 53 53/udp
+
+ENTRYPOINT ["/app/coredns"]

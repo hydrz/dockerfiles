@@ -1,83 +1,35 @@
-FROM ubuntu:20.04
+FROM  ubuntu:20.04
 
 LABEL maintainer "hydrz <n.haoyuan@gmail.com>"
 
-# Start as root
-USER root
+# set version for s6 overlay
+ARG S6_OVERLAY_VERSION=3.1.0.1
 
-###########################################################################
-# CHANGE_SOURCE for in China
-###########################################################################
+# add s6 overlay
+RUN apt-get update && apt-get install -y curl xz-utils
 
-ARG CHANGE_SOURCE=true
-RUN if [ ${CHANGE_SOURCE} = true ]; then \
-    sed -i "s@http://.*archive.ubuntu.com@http://repo.huaweicloud.com@g" /etc/apt/sources.list; \
-    sed -i "s@http://.*security.ubuntu.com@http://repo.huaweicloud.com@g" /etc/apt/sources.list; \
-    fi;
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
 
-###########################################################################
-# Set Timezone
-###########################################################################
+ARG TARGETARCH
+RUN \
+    if [ "$TARGETARCH" = "amd64" ]; then \
+        export OVERLAY_ARCH="x86_64"; \
+    elif [ "$TARGETARCH" = "arm64" ]; then \
+        export OVERLAY_ARCH="aarch64"; \
+    elif [ "$TARGETARCH" = "ppc64le" ] || [ "$TARGETARCH" = "386" ]; then \
+        echo "the arch $TARGETARCH not supported"; \
+        exit 1; \
+    else \
+        export OVERLAY_ARCH=${$TARGETARCH} ; \
+    fi; \
+    curl -L https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.xz -o /tmp/s6-overlay.tar.xz
 
-ARG TZ=Asia/Shanghai
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-###########################################################################
-# Always run apt update when start and after add new source list, then clean up at end.
-###########################################################################
-
-RUN set -xe; \
-    apt-get update -yqq
-
-###########################################################################
-# Common Software's Installation
-###########################################################################
-
-RUN apt-get install -yqq \
-    iputils-ping \
-    iproute2 \
-    iptables \
-    net-tools \
-    dnsutils \
-    bridge-utils \
-    tcpdump \
-    ncat \
-    htop \
-    iotop \
-    iftop \
-    lsof \
-    telnet\
-    whois\
-    traceroute\
-    openssh-client \
-    libzip-dev zip unzip \
-    curl wget \
-    git \
-    vim
-
-#--------------------------------------------------------------------------
-# More Software's Installation
-#--------------------------------------------------------------------------
-
-# zsh
-ARG OHMYZSH_REPO=https://gitee.com/mirrors/oh-my-zsh.git
-
-RUN apt-get install -y zsh
-RUN git clone $OHMYZSH_REPO ~/.oh-my-zsh
-RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
-RUN chsh -s $(which zsh)
-RUN sed -i "s@ZSH_THEME=\"robbyrussell\"@ZSH_THEME=\"ys\"@g" ~/.zshrc
-
-#--------------------------------------------------------------------------
-# Final Touch
-#--------------------------------------------------------------------------
-
-USER root
+RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
+RUN tar -C / -Jxpf /tmp/s6-overlay.tar.xz
 
 # Clean up
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm /var/log/lastlog /var/log/faillog
 
-# Set default work directory
-WORKDIR /root
+ENTRYPOINT ["/init"]
