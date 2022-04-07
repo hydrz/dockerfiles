@@ -37,7 +37,7 @@ RUN \
         echo "the arch $TARGETARCH not supported"; \
         exit 1; \
     else \
-        export OVERLAY_ARCH=${$TARGETARCH} ; \
+        export OVERLAY_ARCH=$(echo $TARGETARCH); \
     fi; \
     curl -L https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.xz -o /tmp/s6-overlay.tar.xz
 
