@@ -30,16 +30,15 @@ ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLA
 ARG TARGETARCH
 RUN \
     if [ "$TARGETARCH" = "amd64" ]; then \
-        export OVERLAY_ARCH="x86_64"; \
+        curl -L https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz -o /tmp/s6-overlay.tar.xz; \
     elif [ "$TARGETARCH" = "arm64" ]; then \
-        export OVERLAY_ARCH="aarch64"; \
+        curl -L https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-aarch64.tar.xz -o /tmp/s6-overlay.tar.xz; \
     elif [ "$TARGETARCH" = "ppc64le" ] || [ "$TARGETARCH" = "386" ]; then \
         echo "the arch $TARGETARCH not supported"; \
         exit 1; \
     else \
-        export OVERLAY_ARCH=$(echo $TARGETARCH); \
-    fi; \
-    curl -L https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.xz -o /tmp/s6-overlay.tar.xz
+        curl -L https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${TARGETARCH}.tar.xz -o /tmp/s6-overlay.tar.xz; \
+    fi;
 
 RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
 RUN tar -C / -Jxpf /tmp/s6-overlay.tar.xz
