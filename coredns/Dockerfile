@@ -1,7 +1,7 @@
-FROM ubuntu:20.04
+FROM hydrz:ubuntu:20.04
 
 RUN apt-get update
-RUN apt-get -y install ca-certificates curl && update-ca-certificates
+RUN apt-get -y install ca-certificates && update-ca-certificates
 
 ARG TARGETOS TARGETARCH
 
@@ -20,6 +20,8 @@ RUN \
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm /var/log/lastlog /var/log/faillog
+
+WORKDIR /app
 
 EXPOSE 53 53/udp
 

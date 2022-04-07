@@ -1,0 +1,5 @@
+#!/command/with-contenv bash
+
+# set up CoreDNS
+[[ ! -f /app/Corefile ]] && \
+  cp /defaults/Corefile /app/Corefile
