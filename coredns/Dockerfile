@@ -1,4 +1,4 @@
-FROM hydrz:ubuntu:20.04
+FROM hydrz/ubuntu:20.04
 
 RUN apt-get update
 RUN apt-get -y install ca-certificates && update-ca-certificates
