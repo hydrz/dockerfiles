@@ -20,8 +20,9 @@ RUN \
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# add local files
+COPY /root /
+
 WORKDIR /app
 
 EXPOSE 53 53/udp
-
-ENTRYPOINT ["/app/coredns"]
