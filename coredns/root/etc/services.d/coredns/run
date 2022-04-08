@@ -1,0 +1,3 @@
+#!/command/with-contenv bash
+
+/app/coredns -dns.port=53 -conf /app/config/coredns/Corefile
