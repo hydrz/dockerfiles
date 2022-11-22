@@ -1,38 +1,27 @@
-FROM  ubuntu:20.04
+FROM ubuntu:22.04
 
 LABEL maintainer "hydrz <n.haoyuan@gmail.com>"
 
-# Start as root
-USER root
-
-###########################################################################
-# CHANGE_SOURCE for in China
-###########################################################################
-
-ARG CHANGE_SOURCE=true
-RUN if [ ${CHANGE_SOURCE} = true ]; then \
-    sed -i "s@http://.*archive.ubuntu.com@http://repo.huaweicloud.com@g" /etc/apt/sources.list; \
-    sed -i "s@http://.*security.ubuntu.com@http://repo.huaweicloud.com@g" /etc/apt/sources.list; \
-    fi;
-
-###########################################################################
 # Set Timezone
-###########################################################################
-
 ARG TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-###########################################################################
-# Always run apt update when start and after add new source list, then clean up at end.
-###########################################################################
+# Change source for in China
+ARG CHANGE_SOURCE="false"
+RUN \ 
+    if [ "${CHANGE_SOURCE}" = "true" ]; then \
+        sed -i "s@http://.*archive.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list; \
+        sed -i "s@http://.*security.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list; \
+    fi;
 
+# Always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
     apt-get update -yqq
 
-###########################################################################
-# Common Software's Installation
-###########################################################################
+# Ca Certificates
+RUN apt-get install -yqq ca-certificates && update-ca-certificates
 
+# Common Software's Installation
 RUN apt-get install -yqq \
     iputils-ping \
     iproute2 \
@@ -53,26 +42,15 @@ RUN apt-get install -yqq \
     libzip-dev zip unzip \
     curl wget \
     git \
-    vim
-
-#--------------------------------------------------------------------------
-# More Software's Installation
-#--------------------------------------------------------------------------
+    vim \
 
 # zsh
 ARG OHMYZSH_REPO=https://gitee.com/mirrors/oh-my-zsh.git
-
 RUN apt-get install -y zsh
 RUN git clone $OHMYZSH_REPO ~/.oh-my-zsh
 RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
 RUN chsh -s $(which zsh)
 RUN sed -i "s@ZSH_THEME=\"robbyrussell\"@ZSH_THEME=\"ys\"@g" ~/.zshrc
-
-#--------------------------------------------------------------------------
-# Final Touch
-#--------------------------------------------------------------------------
-
-USER root
 
 # Clean up
 RUN apt-get clean && \

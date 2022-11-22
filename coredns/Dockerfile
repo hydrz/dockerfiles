@@ -1,7 +1,4 @@
-FROM hydrz/ubuntu:20.04
-
-RUN apt-get update
-RUN apt-get -y install ca-certificates && update-ca-certificates
+FROM hydrz/ubuntu:22.04
 
 ARG TARGETOS TARGETARCH
 
@@ -15,10 +12,6 @@ RUN \
  tar xf \
 	/tmp/coredns.tar.gz -C \
 	/app
-
-# Clean up
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # add local files
 COPY /root /
