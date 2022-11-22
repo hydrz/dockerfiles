@@ -22,10 +22,9 @@ RUN \
             OS_ARCH="armhf";; \
         "amd64") \
             OS_ARCH="x86_64";; \
-        "386") \
-            OS_ARCH="i686";; \
-             echo "the arch $TARGETARCH not supported"; \
-             exit 1; \
+        *) \
+            echo "the arch $TARGETARCH not supported"; \
+            exit 1; \
         esac; \
     curl -L https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${OS_ARCH}.tar.xz -o /tmp/s6-overlay.tar.xz
 ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
