@@ -16,6 +16,6 @@ RUN \
 # add local files
 COPY /root /
 
-WORKDIR /app
+WORKDIR /root
 
 EXPOSE 53 53/udp
