@@ -192,8 +192,7 @@ fi
 
 # svc wireguard
 wg-quick up wg0
-
-trap 'echo "**** Down wg0 interface ****" wg-quick down wg0' TERM INT
+trap 'echo "**** Down wg0 interface ****"; wg-quick down wg0' TERM INT
 
 # check port 53
 if netstat -apn | grep -q ":53 "; then

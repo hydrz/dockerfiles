@@ -34,18 +34,18 @@ RUN apt-get install -y --no-install-recommends \
 # Install CoreDNS
 RUN \ 
 	COREDNS_VERSION=$(curl -sX GET "https://api.github.com/repos/coredns/coredns/releases/latest" \
-		| awk '/tag_name/{print $4;exit}' FS='[""]' | awk '{print substr($1,2); }') ; \
+	| awk '/tag_name/{print $4;exit}' FS='[""]' | awk '{print substr($1,2); }') ; \
 	curl -o \
-		/tmp/coredns.tar.gz -L \
-		"https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_linux_amd64.tgz" ; \
+	/tmp/coredns.tar.gz -L \
+	"https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_linux_amd64.tgz" ; \
 	tar xf \
-		/tmp/coredns.tar.gz -C \
-		/app ;
+	/tmp/coredns.tar.gz -C \
+	/app ;
 
 # Clean up
 RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    rm /var/log/lastlog /var/log/faillog
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+	rm /var/log/lastlog /var/log/faillog
 
 # add local files
 COPY /root /

@@ -1,6 +1,0 @@
-#!/command/with-contenv bash
-
-# set up CoreDNS
-mkdir -p /app/config/coredns
-[[ ! -f /app/config/coredns/Corefile ]] && \
-  cp /defaults/Corefile /app/config/coredns/Corefile
