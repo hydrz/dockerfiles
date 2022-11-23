@@ -32,15 +32,11 @@ RUN apt-get install -y --no-install-recommends \
 	qrencode
 
 # Install CoreDNS
-RUN \ 
-	COREDNS_VERSION=$(curl -sX GET "https://api.github.com/repos/coredns/coredns/releases/latest" \
-	| awk '/tag_name/{print $4;exit}' FS='[""]' | awk '{print substr($1,2); }') ; \
-	curl -o \
-	/tmp/coredns.tar.gz -L \
-	"https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_linux_amd64.tgz" ; \
-	tar xf \
-	/tmp/coredns.tar.gz -C \
-	/app ;
+ARG COREDNS_VERSION=1.10.0
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
+ADD https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_${TARGETOS}_${TARGETARCH}.tgz /tmp/coredns.tar.gz
+RUN tar xf /tmp/coredns.tar.gz -C /app
 
 # Clean up
 RUN apt-get clean && \
