@@ -10,8 +10,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ARG CHANGE_SOURCE="false"
 RUN \ 
     if [ "${CHANGE_SOURCE}" = "true" ]; then \
-        sed -i "s@http://.*archive.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list; \
-        sed -i "s@http://.*security.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list; \
+    sed -i "s@http://.*archive.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list; \
+    sed -i "s@http://.*security.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list; \
     fi;
 
 # Always run apt update when start and after add new source list, then clean up at end.
@@ -42,10 +42,10 @@ RUN apt-get install -yqq \
     libzip-dev zip unzip \
     curl wget \
     git \
-    vim \
+    vim 
 
 # zsh
-ARG OHMYZSH_REPO=https://gitee.com/mirrors/oh-my-zsh.git
+ARG OHMYZSH_REPO=https://github.com/ohmyzsh/ohmyzsh.git
 RUN apt-get install -y zsh
 RUN git clone $OHMYZSH_REPO ~/.oh-my-zsh
 RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
@@ -59,3 +59,5 @@ RUN apt-get clean && \
 
 # Set default work directory
 WORKDIR /root
+
+ENTRYPOINT [ "sleep", "infinity"]
