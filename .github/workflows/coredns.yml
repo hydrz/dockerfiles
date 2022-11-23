@@ -19,7 +19,6 @@ jobs:
             hydrz/coredns
           tags: |
             type=match,pattern=coredns-(.*),group=1
-            type=match,pattern=coredns-(\d*.\d*),group=1
             type=match,pattern=coredns-(\d*.\d*.\d*),group=1
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
