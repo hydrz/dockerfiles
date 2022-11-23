@@ -181,7 +181,9 @@ else
         echo "**** No client conf found. Provide your own client conf as \"/config/wg0.conf\". ****"
         exit 1
     fi
-    USE_COREDNS="false"
+    if [ -z "$USE_COREDNS" ]; then
+        USE_COREDNS="false"
+    fi
 fi
 
 # set up CoreDNS
